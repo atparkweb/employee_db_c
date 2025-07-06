@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) {
 
 	// Database file descriptor
 	int dbfd = -1;
+	struct dbheader_t *dbhdr = NULL;
 
 	if (argc < 2) {
 		print_usage(argv);
@@ -53,7 +54,10 @@ int main(int argc, char *argv[]) {
 			printf("Unable to create database file\n");
 			return -1;
 		}
-		printf("Created DB file\n");
+		if(create_db_header(dbfd, &dbhdr) == STATUS_ERROR) {
+			printf("Failed to create database header\n");
+			return -1;
+		}
 	} else {
 		dbfd = open_db_file(filepath);
 		if (dbfd == STATUS_ERROR) {
