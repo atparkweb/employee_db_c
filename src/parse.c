@@ -9,6 +9,25 @@
 #include "common.h"
 #include "parse.h"
 
+void output_file(int fd, struct dbheader_t *dbhdr) {
+	if (fd < 0) {
+		printf("Got a bad fd from the user\n");
+		return STATUS_ERROR;
+	}
+
+	// Convert data to network endianess to prepare for writing to file
+	dbhdr->magic = htonl(dbhdr->magic);
+	dbhdr->filesize = htonl(dbhdr->filesize);
+	dbhdr->count = htons(dbhdr->filesize);
+	dbhdr->version = htons(dbhdr->version);
+
+	// Set file cursor to beginning of file
+	lseek(fd, 0, SEEK_SET);
+
+	write(fd, dbhdr, sizeof(struct dbheader_t));
+
+	return;
+}
 
 int validate_db_header(int fd, struct dbheader_t **headerOut) {
 	if (fd < 0) {
@@ -28,7 +47,7 @@ int validate_db_header(int fd, struct dbheader_t **headerOut) {
 		return STATUS_ERROR;
 	}
 
-	// Unpack data to host endianess
+	// Unpack data to host endianess to store in memory
 	header->version = ntohs(header->version);
 	header->count = ntohs(header->count);
 	header->magic = ntohl(header->magic);
@@ -53,6 +72,8 @@ int validate_db_header(int fd, struct dbheader_t **headerOut) {
 		free(header);
 		return -1;
 	}
+
+	*headerOut = header;
 
 	return 0;
 };
