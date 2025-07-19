@@ -18,7 +18,7 @@ void output_file(int fd, struct dbheader_t *dbhdr) {
 	// Convert data to network endianess to prepare for writing to file
 	dbhdr->magic = htonl(dbhdr->magic);
 	dbhdr->filesize = htonl(dbhdr->filesize);
-	dbhdr->count = htons(dbhdr->filesize);
+	dbhdr->count = htons(dbhdr->count);
 	dbhdr->version = htons(dbhdr->version);
 
 	// Set file cursor to beginning of file
