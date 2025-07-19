@@ -16,23 +16,28 @@ void print_usage(char *argv[]) {
 int main(int argc, char *argv[]) {
 	char *filepath = NULL;
 	bool newfile = false;
+	char *addstring = NULL;
 	int opt = 0;
 
 	// Database file descriptor
 	int dbfd = -1;
 	struct dbheader_t *dbhdr = NULL;
+	struct employee_t *employees = NULL;
 
 	if (argc < 2) {
 		print_usage(argv);
 	}
 
-	while ((opt = getopt(argc, argv, "nf:")) != -1) {
+	while ((opt = getopt(argc, argv, "nf:a:")) != -1) {
 		switch (opt) {
 			case 'n':
 				newfile = true;
 				break;
 			case 'f':
 				filepath = optarg;
+				break;
+			case 'a':
+				addstring = optarg;
 				break;
 			case '?':
 				printf("Unknown option -%c\n", opt);
@@ -71,10 +76,20 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	printf("Newfile: %d\n", newfile);
-	printf("Filepath: %s\n", filepath);
+	if (read_employees(dbfd, dbhdr, &employees) != STATUS_SUCCESS) {
+		printf("Failed to read employees\n");
+		return 0;
+	}
 
-	output_file(dbfd, dbhdr);
+	if (addstring) {
+		// Update counter and reallocated memory for new employee
+		dbhdr->count++;
+		employees = realloc(employees, dbhdr->count*(sizeof(struct employee_t)));
+
+		add_employee(dbhdr, employees, addstring);
+	}
+
+	output_file(dbfd, dbhdr, employees);
 
 	return 0;
 }
