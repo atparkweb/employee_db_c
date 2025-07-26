@@ -17,6 +17,7 @@ int main(int argc, char *argv[]) {
 	char *filepath = NULL;
 	bool newfile = false;
 	char *addstring = NULL;
+	bool list = false;
 	int opt = 0;
 
 	// Database file descriptor
@@ -28,7 +29,7 @@ int main(int argc, char *argv[]) {
 		print_usage(argv);
 	}
 
-	while ((opt = getopt(argc, argv, "nf:a:")) != -1) {
+	while ((opt = getopt(argc, argv, "lnf:a:")) != -1) {
 		switch (opt) {
 			case 'n':
 				newfile = true;
@@ -38,6 +39,9 @@ int main(int argc, char *argv[]) {
 				break;
 			case 'a':
 				addstring = optarg;
+				break;
+			case 'l':
+				list = true;
 				break;
 			case '?':
 				printf("Unknown option -%c\n", opt);
@@ -87,6 +91,10 @@ int main(int argc, char *argv[]) {
 		employees = realloc(employees, dbhdr->count*(sizeof(struct employee_t)));
 
 		add_employee(dbhdr, employees, addstring);
+	}
+
+	if (list) {
+		list_employees(dbhdr, employees);
 	}
 
 	output_file(dbfd, dbhdr, employees);
