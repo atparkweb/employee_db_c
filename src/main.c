@@ -43,6 +43,8 @@ int main(int argc, char *argv[]) {
 			case 'l':
 				list = true;
 				break;
+			// TODO add option to remove employee by name
+			// TODO add option to update employee hours by name
 			case '?':
 				printf("Unknown option -%c\n", opt);
 				break;
